@@ -2,12 +2,15 @@
 
 namespace Config;
 
-use CodeIgniter\Database\Config;
+//use CodeIgniter\Database\Config;
 
 /**
  * Database Configuration
+ * @package Config
  */
-class Database extends Config
+
+//class Database extends Config
+class Database extends \CodeIgniter\Database\Config
 {
 	/**
 	 * The directory that holds the Migrations
@@ -15,8 +18,8 @@ class Database extends Config
 	 *
 	 * @var string
 	 */
-	public $filesPath = APPPATH . 'Database' . DIRECTORY_SEPARATOR;
-
+	//public $filesPath = APPPATH . 'Database' . DIRECTORY_SEPARATOR;
+	public $filesPath = APPPATH . 'Database/';
 	/**
 	 * Lets you choose which connection group to
 	 * use if no other is specified.
@@ -33,13 +36,17 @@ class Database extends Config
 	public $default = [
 		'DSN'      => '',
 		'hostname' => 'localhost',
-		'username' => '',
+		//'username' => '',
+		'username' => 'root',
 		'password' => '',
-		'database' => '',
+		//'database' => '',
+		'database' => 'codeigniter-crud',
 		'DBDriver' => 'MySQLi',
 		'DBPrefix' => '',
 		'pConnect' => false,
 		'DBDebug'  => (ENVIRONMENT !== 'production'),
+		'cacheOn' => false, //was added on none in original default config
+		'cacheDir' => '', //was added none in original default config
 		'charset'  => 'utf8',
 		'DBCollat' => 'utf8_general_ci',
 		'swapPre'  => '',
@@ -66,6 +73,8 @@ class Database extends Config
 		'DBPrefix' => 'db_',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
 		'pConnect' => false,
 		'DBDebug'  => (ENVIRONMENT !== 'production'),
+		'cacheOn' => false, //added not in original default config
+		'cacheDir' => '', //added not in original default config
 		'charset'  => 'utf8',
 		'DBCollat' => 'utf8_general_ci',
 		'swapPre'  => '',
@@ -88,6 +97,21 @@ class Database extends Config
 		if (ENVIRONMENT === 'testing')
 		{
 			$this->defaultGroup = 'tests';
+
+			//all the following was added to test multiple databases
+			//travis-cli is required
+			if($group =getenv('DB'))
+				{
+					if(is_file(TESTPATH . 'travis/Database.php'))
+						{
+							require TESTPATH . 'travis/Database.php';
+
+							if(! empty($dbconfig) && array_key_exists($group, $dbconfig))
+								{
+									$this->tests = $dbconfig[$group];
+								}
+						}
+				}
 		}
 	}
 
